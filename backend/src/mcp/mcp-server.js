@@ -1,7 +1,7 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import { getPlatformAnalytics, invalidateAnalyticsCache } from '../services/analytics.service.js';
+import { getPlatformAnalytics } from '../services/analytics.service.js';
 import { pool } from '../config/db.js';
 import { enqueueRenewalReminder } from '../services/queue.service.js';
 
@@ -182,9 +182,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 });
 
 export async function runMcpServer() {
+    // Redirect console.log to console.error so stdout is 100% clean for JSON-RPC messages
+    console.log = console.error;
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    console.log('🤖 MCP Server running on stdio');
+    console.error('MCP Server running on stdio');
 }
 
 if (process.argv[1]?.endsWith('mcp-server.js')) {
