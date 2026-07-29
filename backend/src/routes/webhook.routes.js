@@ -66,33 +66,48 @@ router.post('/stripe', express.raw({ type: 'application/json' }), async (req, re
                 );
                 const subscription = subRes.rows[0];
 
-                // Create Invoice
-                const invoiceDbRes = await pool.query(
-                    `INSERT INTO invoices (subscription_id, user_id, stripe_invoice_id, amount_paid, status)
-                    VALUES ($1, $2, $3, $4, 'paid') RETURNING *`,
-                    [subscription.id, user.id, session.invoice || `inv_${Date.now()}`, amount]
+                const stripeInvoiceId = session.invoice || `inv_session_${session.id}`;
+
+                // Deduplication check: See if verify-session handler already created the invoice
+                const existingInvoiceRes = await pool.query(
+                    'SELECT * FROM invoices WHERE stripe_invoice_id = $1',
+                    [stripeInvoiceId]
                 );
-                const invoiceRecord = invoiceDbRes.rows[0];
 
-                // Generate PDF Invoice
-                const pdfResult = await generateInvoicePDF({
-                    invoiceId: invoiceRecord.id,
-                    userEmail: user.email,
-                    userName: user.name,
-                    planName,
-                    amount
-                });
+                let invoiceRecord;
+                if (existingInvoiceRes.rows.length > 0) {
+                    console.log(`ℹ️ Invoice ${stripeInvoiceId} already created by verify-session handler. Skipping duplicate generation.`);
+                    invoiceRecord = existingInvoiceRes.rows[0];
+                } else {
+                    const invoiceDbRes = await pool.query(
+                        `INSERT INTO invoices (subscription_id, user_id, stripe_invoice_id, amount_paid, status)
+                        VALUES ($1, $2, $3, $4, 'paid')
+                        ON CONFLICT (stripe_invoice_id) DO NOTHING
+                        RETURNING *`,
+                        [subscription.id, user.id, stripeInvoiceId, amount]
+                    );
+                    invoiceRecord = invoiceDbRes.rows[0];
 
-                await pool.query('UPDATE invoices SET pdf_path = $1 WHERE id = $2', [pdfResult.filePath, invoiceRecord.id]);
+                    if (invoiceRecord) {
+                        const pdfResult = await generateInvoicePDF({
+                            invoiceId: invoiceRecord.id,
+                            userEmail: user.email,
+                            userName: user.name,
+                            planName,
+                            amount
+                        });
 
-                // Send Email
-                await sendSubscriptionConfirmation({
-                    userEmail: user.email,
-                    userName: user.name,
-                    planName,
-                    amount,
-                    invoicePath: pdfResult.filePath
-                });
+                        await pool.query('UPDATE invoices SET pdf_path = $1 WHERE id = $2', [pdfResult.filePath, invoiceRecord.id]);
+
+                        await sendSubscriptionConfirmation({
+                            userEmail: user.email,
+                            userName: user.name,
+                            planName,
+                            amount,
+                            invoicePath: pdfResult.filePath
+                        });
+                    }
+                }
 
                 // Invalidate Cache
                 await invalidateAnalyticsCache();
