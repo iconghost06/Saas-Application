@@ -1,18 +1,15 @@
 import React from 'react';
-import { Zap, LogOut, Shield, User } from 'lucide-react';
+import { LogOut, Shield, User } from 'lucide-react';
 
 export default function Header({ user, onLogout }) {
   return (
     <header className="app-header">
       <div className="header-inner">
-        {/* Brand Logo */}
+        {/* Brand Title without logo icon */}
         <div className="brand-wrapper">
-          <div className="brand-icon-box">
-            <Zap size={22} color="#fff" />
-          </div>
           <div>
-            <h1 className="brand-title">SaaS Pulse</h1>
-            <p className="brand-subtitle">AI Subscription & Analytics Platform</p>
+            <h1 className="brand-title">Saas Application</h1>
+            <p className="brand-subtitle">Subscription & Analytics Platform</p>
           </div>
         </div>
 
@@ -20,7 +17,7 @@ export default function Header({ user, onLogout }) {
         {user && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '13px', fontWeight: '700', color: '#fff' }}>{user.name}</div>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)' }}>{user.name}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end', marginTop: '2px' }}>
                 <span className={`badge ${user.role === 'admin' ? 'badge-primary' : 'badge-success'}`} style={{ fontSize: '10px', padding: '2px 8px' }}>
                   {user.role === 'admin' ? <Shield size={10} /> : <User size={10} />}
