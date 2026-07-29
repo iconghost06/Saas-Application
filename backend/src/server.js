@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 
 async function bootstrap() {
     try {
-        console.log('🚀 Bootstrapping SaaS Analytics Backend Server...');
+        console.log('Bootstrapping SaaS Analytics Backend Server...');
 
         // 1. Initialize DB schema
         await initDb();
@@ -19,11 +19,11 @@ async function bootstrap() {
 
         // 3. Start Express Server
         app.listen(PORT, () => {
-            console.log(`✨ Backend API Server listening at http://localhost:${PORT}`);
-            console.log(`🤖 MCP HTTP Bridge endpoint available at http://localhost:${PORT}/api/mcp/execute`);
+            console.log(`Backend API Server listening at http://localhost:${PORT}`);
+            console.log(`MCP HTTP Bridge endpoint available at http://localhost:${PORT}/api/mcp/execute`);
         });
     } catch (err) {
-        console.error('❌ Bootstrap failure:', err);
+        console.error('Bootstrap failure:', err);
         process.exit(1);
     }
 }

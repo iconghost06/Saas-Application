@@ -10,22 +10,23 @@ export default function ClientDashboard({ user }) {
 
   const loadClientData = async () => {
     try {
-      // 1. Fetch dynamic pricing plans from backend
       const plansRes = await fetch('/api/checkout/plans');
       const plansData = await plansRes.json();
-      setPlans(plansData);
+      setPlans(Array.isArray(plansData) ? plansData : []);
 
-      // 2. Fetch subscriber history for this logged in client
       const subRes = await fetch('/api/subscriptions/list');
       const allSubs = await subRes.json();
-      const userSub = allSubs.find((s) => s.user_email === user.email);
-      setSubscription(userSub || null);
+      if (Array.isArray(allSubs)) {
+        const userSub = allSubs.find((s) => s.user_email === user.email);
+        setSubscription(userSub || null);
+      }
 
-      // 3. Fetch client invoices
       const invRes = await fetch('/api/subscriptions/invoices');
       const allInvoices = await invRes.json();
-      const userInvoices = allInvoices.filter((i) => i.user_email === user.email);
-      setInvoices(userInvoices);
+      if (Array.isArray(allInvoices)) {
+        const userInvoices = allInvoices.filter((i) => i.user_email === user.email);
+        setInvoices(userInvoices);
+      }
     } catch (err) {
       console.error('Failed to load client portal data:', err);
     } finally {
@@ -35,7 +36,6 @@ export default function ClientDashboard({ user }) {
 
   useEffect(() => {
     loadClientData();
-    // Handle Stripe checkout return redirect verification
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get('session_id');
     if (sessionId) {
@@ -43,7 +43,7 @@ export default function ClientDashboard({ user }) {
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {
-            alert('🎉 Payment verified by Stripe! Your subscription is active.');
+            alert('Payment verified by Stripe. Your subscription is active.');
             window.history.replaceState({}, document.title, window.location.pathname);
             loadClientData();
           }
@@ -67,10 +67,9 @@ export default function ClientDashboard({ user }) {
 
       const data = await res.json();
       if (data.url) {
-        // Redirect directly to official Stripe Payment Checkout Portal!
         window.location.href = data.url;
       } else if (data.success) {
-        alert('🎉 Subscription activated successfully!');
+        alert('Subscription activated successfully.');
         loadClientData();
       } else {
         alert('Checkout error: ' + (data.error || 'Could not initiate Stripe checkout'));

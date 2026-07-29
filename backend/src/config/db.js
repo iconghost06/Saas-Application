@@ -30,8 +30,8 @@ export async function initDb() {
         const schemaSql = fs.readFileSync(schemaPath, 'utf8');
         await client.query(schemaSql);
         client.release();
-        console.log('✅ PostgreSQL Database schema initialized successfully');
+        console.log('PostgreSQL Database schema initialized successfully');
     } catch (error) {
-        console.error('❌ Failed to initialize PostgreSQL database schema:', error.message);
+        console.error('Failed to initialize PostgreSQL database schema:', error.message);
     }
 }

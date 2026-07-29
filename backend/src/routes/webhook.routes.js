@@ -21,11 +21,11 @@ router.post('/stripe', express.raw({ type: 'application/json' }), async (req, re
             event = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
         }
     } catch (err) {
-        console.error('⚠️ Stripe Webhook signature verification failed:', err.message);
+        console.error('Stripe Webhook signature verification failed:', err.message);
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    console.log(`⚡ Received Stripe Webhook Event: ${event.type}`);
+    console.log(`Received Stripe Webhook Event: ${event.type}`);
 
     try {
         switch (event.type) {
@@ -76,7 +76,7 @@ router.post('/stripe', express.raw({ type: 'application/json' }), async (req, re
 
                 let invoiceRecord;
                 if (existingInvoiceRes.rows.length > 0) {
-                    console.log(`ℹ️ Invoice ${stripeInvoiceId} already created by verify-session handler. Skipping duplicate generation.`);
+                    console.log(`Invoice ${stripeInvoiceId} already created by verify-session handler. Skipping duplicate generation.`);
                     invoiceRecord = existingInvoiceRes.rows[0];
                 } else {
                     const invoiceDbRes = await pool.query(
@@ -130,7 +130,7 @@ router.post('/stripe', express.raw({ type: 'application/json' }), async (req, re
 
         res.json({ received: true });
     } catch (err) {
-        console.error('❌ Webhook processing error:', err.message);
+        console.error('Webhook processing error:', err.message);
         res.status(500).json({ error: err.message });
     }
 });

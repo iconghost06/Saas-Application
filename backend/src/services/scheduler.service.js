@@ -3,19 +3,16 @@ import { pool } from '../config/db.js';
 import { enqueueRenewalReminder } from './queue.service.js';
 
 export function startSubscriptionScheduler() {
-    // Schedule cron to run every 6 hours (or configurable)
-    // Format: minute hour day month day-of-week
-    console.log('⏰ Starting Subscription Expiration Lifecycle Scheduler (Cron)...');
+    console.log('Starting Subscription Expiration Lifecycle Scheduler (Cron)...');
 
     cron.schedule('0 */6 * * *', async () => {
-        console.log('🔍 [Cron Job] Running check for expiring subscriptions...');
+        console.log('[Cron Job] Running check for expiring subscriptions...');
         await checkAndProcessExpiringSubscriptions();
     });
 }
 
 export async function checkAndProcessExpiringSubscriptions() {
     try {
-        // Query subscriptions expiring in the next 3 days that are still active
         const query = `
             SELECT 
                 s.id as subscription_id, 
@@ -30,7 +27,7 @@ export async function checkAndProcessExpiringSubscriptions() {
               AND s.current_period_end <= NOW() + INTERVAL '3 days'
         `;
         const result = await pool.query(query);
-        console.log(`📋 Found ${result.rows.length} expiring subscriptions near period end.`);
+        console.log(`Found ${result.rows.length} expiring subscriptions near period end.`);
 
         for (const row of result.rows) {
             await enqueueRenewalReminder({
@@ -43,7 +40,7 @@ export async function checkAndProcessExpiringSubscriptions() {
         }
         return result.rows.length;
     } catch (err) {
-        console.error('❌ Error during expiring subscription check:', err.message);
+        console.error('Error during expiring subscription check:', err.message);
         throw err;
     }
 }

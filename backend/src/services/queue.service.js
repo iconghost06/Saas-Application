@@ -15,7 +15,7 @@ export const renewalWorker = new Worker(
     QUEUE_NAME,
     async (job) => {
         const { userEmail, userName, planName, periodEnd } = job.data;
-        console.log(`📌 BullMQ Worker processing renewal job #${job.id} for ${userEmail}`);
+        console.log(`BullMQ Worker processing renewal job #${job.id} for ${userEmail}`);
         await sendRenewalReminder({ userEmail, userName, planName, periodEnd });
         return { status: 'sent', userEmail };
     },
@@ -23,11 +23,11 @@ export const renewalWorker = new Worker(
 );
 
 renewalWorker.on('completed', (job, result) => {
-    console.log(`✅ BullMQ Renewal job #${job.id} completed:`, result);
+    console.log(`BullMQ Renewal job #${job.id} completed:`, result);
 });
 
 renewalWorker.on('failed', (job, err) => {
-    console.error(`❌ BullMQ Renewal job #${job?.id} failed:`, err.message);
+    console.error(`BullMQ Renewal job #${job?.id} failed:`, err.message);
 });
 
 export async function enqueueRenewalReminder(payload) {
@@ -39,10 +39,10 @@ export async function enqueueRenewalReminder(payload) {
                 delay: 2000
             }
         });
-        console.log(`🚀 Renewal reminder job #${job.id} enqueued for ${payload.userEmail}`);
+        console.log(`Renewal reminder job #${job.id} enqueued for ${payload.userEmail}`);
         return job;
     } catch (err) {
-        console.error('❌ Failed to enqueue renewal reminder job:', err.message);
+        console.error('Failed to enqueue renewal reminder job:', err.message);
         throw err;
     }
 }

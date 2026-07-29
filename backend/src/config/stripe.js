@@ -19,4 +19,4 @@ export const isStripeConfigured = () => {
     return stripeSecretKey && stripeSecretKey.startsWith('sk_test_') && stripeSecretKey !== 'sk_test_mock_key';
 };
 
-console.log(isStripeConfigured() ? `✅ Stripe SDK initialized with Test Secret Key (${stripeSecretKey.substring(0, 12)}...)` : 'ℹ️ Stripe SDK running in Simulated Test Mode fallback');
+console.log(isStripeConfigured() ? `Stripe SDK initialized with Test Secret Key (${stripeSecretKey.substring(0, 12)}...)` : 'Stripe SDK running in Simulated Test Mode fallback');

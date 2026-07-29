@@ -26,7 +26,7 @@ export async function getEmailTransporter() {
             port: parseInt(process.env.SMTP_PORT || '2525', 10),
             auth: { user, pass }
         });
-        console.log(`✅ Nodemailer connected to Mailtrap Sandbox SMTP (${host}:${process.env.SMTP_PORT || 2525})`);
+        console.log(`Nodemailer connected to Mailtrap Sandbox SMTP (${host}:${process.env.SMTP_PORT || 2525})`);
     } else {
         try {
             const testAccount = await nodemailer.createTestAccount();
@@ -39,9 +39,9 @@ export async function getEmailTransporter() {
                     pass: testAccount.pass
                 }
             });
-            console.log(`✅ Nodemailer connected to Ethereal Email Test Account (${testAccount.user})`);
+            console.log(`Nodemailer connected to Ethereal Email Test Account (${testAccount.user})`);
         } catch (err) {
-            console.warn('⚠️ Could not create Ethereal test account, using JSON transport fallback:', err.message);
+            console.warn('Could not create Ethereal test account, using JSON transport fallback:', err.message);
             transporter = nodemailer.createTransport({ jsonTransport: true });
         }
     }

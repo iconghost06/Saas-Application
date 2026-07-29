@@ -62,7 +62,7 @@ export async function getPlatformAnalytics(forceRefresh = false) {
 
         return analyticsData;
     } catch (err) {
-        console.error('❌ Error computing platform analytics:', err.message);
+        console.error('Error computing platform analytics:', err.message);
         throw err;
     }
 }
@@ -70,8 +70,8 @@ export async function getPlatformAnalytics(forceRefresh = false) {
 export async function invalidateAnalyticsCache() {
     try {
         await redisClient.del(CACHE_KEY);
-        console.log('⚡ Redis Analytics Cache invalidated successfully');
+        console.log('Redis Analytics Cache invalidated successfully');
     } catch (err) {
-        console.error('⚠️ Failed to invalidate Redis cache:', err.message);
+        console.error('Failed to invalidate Redis cache:', err.message);
     }
 }

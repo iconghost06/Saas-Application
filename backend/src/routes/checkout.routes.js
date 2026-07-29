@@ -72,7 +72,7 @@ router.post('/create-session', async (req, res) => {
         const selectedPlan = PRICING_TIERS[planId.toLowerCase()] || PRICING_TIERS.pro;
         const appUrl = process.env.APP_URL || 'http://localhost:5173';
 
-        console.log(`💳 Creating Stripe Checkout Session for ${userEmail} (${selectedPlan.name} - Price ID: ${selectedPlan.stripePriceId})...`);
+        console.log(`Creating Stripe Checkout Session for ${userEmail} (${selectedPlan.name} - Price ID: ${selectedPlan.stripePriceId})...`);
 
         if (isStripeConfigured()) {
             const session = await stripe.checkout.sessions.create({
@@ -167,7 +167,7 @@ router.post('/create-session', async (req, res) => {
             });
         }
     } catch (err) {
-        console.error('❌ Checkout session creation failed:', err.message);
+        console.error('Checkout session creation failed:', err.message);
         res.status(500).json({ error: err.message });
     }
 });
@@ -228,7 +228,7 @@ router.get('/verify-session', async (req, res) => {
 
         let invoiceRecord;
         if (existingInvoiceRes.rows.length > 0) {
-            console.log(`ℹ️ Invoice ${stripeInvoiceId} already created by webhook handler. Skipping duplicate generation.`);
+            console.log(`Invoice ${stripeInvoiceId} already created by webhook handler. Skipping duplicate generation.`);
             invoiceRecord = existingInvoiceRes.rows[0];
         } else {
             const invoiceDbRes = await pool.query(
@@ -265,7 +265,7 @@ router.get('/verify-session', async (req, res) => {
 
         res.json({ success: true, subscription, user });
     } catch (err) {
-        console.error('❌ Verify session error:', err.message);
+        console.error('Verify session error:', err.message);
         res.status(500).json({ error: err.message });
     }
 });
